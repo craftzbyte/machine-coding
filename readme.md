@@ -1,1 +1,1 @@
-#repos for machine codign
+#repos for machine coding
