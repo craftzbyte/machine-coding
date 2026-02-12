@@ -1,0 +1,19 @@
+.tab-headings {
+  display: flex;
+}
+.tab-container {
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid black;
+  cursor: pointer;
+}
+.parent-div {
+  width: 400px;
+  border: 1px solid red;
+  height: 10px;
+  overflow: hidden;
+}
+.search-div {
+  height: 100%;
+  background-color: aqua;
+}
