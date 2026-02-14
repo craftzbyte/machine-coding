@@ -5,6 +5,9 @@ import { useState } from "react";
 import SearchBar from "./components/SearchBar";
 import UseReducerExample from "./components/UseReducerExample";
 import Link from "next/link";
+import DebouncingExample from "./components/DebouncingExample";
+import Counter from "./components/Counter";
+import USECALLBACKEX from "./components/USECALLBACKEX";
 
 function Home() {
   const [activeTab, setActiveTab] = useState(TabConfigs[0]);
@@ -48,9 +51,7 @@ function Home() {
 export default function App() {
   return (
     <div>
-      HomePage
-      <Link href={"/foldermanager"}>Go to folder manager</Link>
-      {/* <UseReducerExample /> */}
+      <USECALLBACKEX />
     </div>
   );
 }

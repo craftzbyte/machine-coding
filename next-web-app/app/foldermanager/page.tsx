@@ -32,7 +32,7 @@ const traverseArray = (array: [], id, name) => {
   array.forEach((item) => {
     if (item.id === id) {
       item.child.push({
-        id: getID,
+        id: getID(),
         name: name,
         type: "folder",
         child: [],
@@ -48,12 +48,12 @@ export default function FolderManager() {
   const onAdd = ({ id, name, type }) => {
     const array = structuredClone(fileInfo);
     traverseArray(array, id, name);
-    console.log(array);
+    setFileInfo(array);
   };
 
   return (
     <div>
-      {initialJson.map((item, key) => {
+      {fileInfo.map((item, key) => {
         return <FolderComponent setNewNode={onAdd} item={item} key={key} />;
       })}
     </div>
@@ -80,13 +80,13 @@ const FolderComponent = ({ item, setNewNode }) => {
       </div>
       <div style={{ marginLeft: "15px" }}>
         {item.type === "folder" &&
-          item?.child?.map((item, key) => {
+          item?.child?.map((child, key) => {
             return (
               <div key={key}>
-                {item.type === "folder" ? (
-                  <FolderComponent setNewNode={setNewNode} item={item} />
+                {child.type === "folder" ? (
+                  <FolderComponent setNewNode={setNewNode} item={child} />
                 ) : (
-                  item.name
+                  child.name
                 )}
               </div>
             );
