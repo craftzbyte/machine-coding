@@ -14,3 +14,6 @@ Setting state to the same value silently bails out — but with a catch. React u
 Non-Primitive Types (Reference Types)
 These are mutable and stored by reference:\
 // Primitives are immutable
+
+// strings
+// extensively use sets maps and all
