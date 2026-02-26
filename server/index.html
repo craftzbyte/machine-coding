@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    Webpage
+    <div id="content"></div>
+  </body>
+  <script>
+    let intervalId = null;
+    let isFetching = false; // prevents overlapping requests
+    let abortController = null; // allows in-flight request cancellation
+    async function getData() {
+      if (isFetching) return;
+      isFetching = true;
+      abortController = new AbortController();
+      try {
+        const response = await fetch("/fetchData", {
+          signal: abortController.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+        const data = await response.json();
+      } catch (error) {
+        if (err.name === "AbortError") {
+          console.log("Fetch aborted"); // expected on cleanup
+        } else {
+          console.error("Polling error:", err); // real errors
+          stopPolling(); // stop on unrecoverable error
+        }
+      } finally {
+        isFetching = false;
+      }
+      function stopPolling() {
+        // 1. Clear the interval
+        if (intervalId !== null) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+
+        // 2. Abort any in-flight fetch to free network resources
+        if (abortController) {
+          abortController.abort();
+          abortController = null;
+        }
+
+        isFetching = false;
+        console.log("Polling stopped");
+      }
+      document.getElementById("content").innerHTML = JSON.stringify(data);
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+      const id = setInterval(() => {
+        getData();
+      }, 1000);
+    });
+  </script>
+</html>
