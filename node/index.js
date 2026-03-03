@@ -193,6 +193,128 @@ var reverseStr = function (s, k) {
   return stringAr.join("");
 };
 
-console.log(reverseStr("efgabcddds", 3));
-//efgabcddds
-//0123456789
+var isPalindrome = function (s) {
+  let i = 0;
+  let j = s.length - 1;
+  while (i < j) {
+    if (!s[i].match(/[a-z0-9]/i)) {
+      i++;
+      continue;
+    }
+    if (!s[j].match(/[a-z0-9]/i)) {
+      j--;
+      continue;
+    }
+    if (!(s[i].toLowerCase() === s[j].toLowerCase())) {
+      return false;
+    } else {
+      i++;
+      j--;
+    }
+  }
+  return true;
+};
+
+const orders = [
+  { customer: "Alice", product: "Laptop", amount: 1200 },
+  { customer: "Bob", product: "Phone", amount: 800 },
+  { customer: "Alice", product: "Phone", amount: 800 },
+  { customer: "Alice", product: "Laptop", amount: 1200 },
+  { customer: "Bob", product: "Tablet", amount: 500 },
+];
+
+function summarize(orders) {
+  const data = orders.reduce((result, info) => {
+    if (!(info.customer in result)) {
+      result[info.customer] = {
+        totalAmount: info.amount,
+        orderQuantity: 1,
+        products: new Set([info.product]),
+      };
+    } else {
+      result[info.customer].totalAmount += info.amount;
+      result[info.customer].orderQuantity += 1;
+      result[info.customer].products.add(info.product);
+    }
+    return result;
+  }, {});
+  for (let key in data) {
+    data[key].products = [...data[key].products];
+  }
+
+  return data;
+}
+console.log(summarize(orders));
+
+//prevent Objject mutations;
+
+const freezeAll = (obj) => {
+  if (!(typeof obj === "object" && obj !== null)) return;
+  for (let key in obj) {
+    if (typeof obj[key] === "object") {
+      freezeAll(obj[key]);
+    }
+  }
+
+  return Object.freeze(obj);
+};
+
+// flattening a deep nested Object
+
+const company = {
+  name: "TechCorp",
+  ceo: {
+    name: "John",
+    age: 45,
+    address: {
+      city: "New York",
+      street: {
+        name: "5th Avenue",
+        number: 101,
+        apartment: {
+          floor: 12,
+          unit: "B",
+          rooms: 3,
+        },
+      },
+    },
+  },
+};
+
+const deepFlat = (obj, prefix = "", result = {}) => {
+  const isJSOb = (data) => typeof data === "object" && !Array.isArray(data) && data !== null;
+  for (let key in obj) {
+    const newKey = prefix ? `${prefix}.${key}` : key;
+    if (isJSOb(obj[key])) {
+      deepFlat(obj[key], newKey, result);
+    } else {
+      result[newKey] = obj[key];
+    }
+  }
+
+  return result;
+};
+console.log(deepFlat(company, "", {}));
+
+let unflat = (obj) => {
+  let result = {};
+  for (let k in obj) {
+    let current = result;
+    let keys = k.split(".");
+    for (let i in keys) {
+      console.log(i, keys.length - 1);
+      if (+i === keys.length - 1) {
+        console.log(i, keys.length - 1, obj[k]);
+
+        current[keys[i]] = obj[k];
+      } else {
+        current[keys[i]] = current[keys[i]] || {};
+        current = current[keys[i]];
+      }
+    }
+  }
+
+  return result;
+};
+
+console.log(unflat(deepFlat(company, "", {})));

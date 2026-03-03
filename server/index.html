@@ -10,9 +10,21 @@
     <div id="content"></div>
   </body>
   <script>
+    //long polling example
+    //here we keep the connection alive
+    let controller_ = null;
+    const getLongPollData = async () => {
+      controller_ = new AbortController();
+      const response = await fetch("/getDataLongPoll", { signal: controller_.signal });
+      const data = await response.json();
+      getLongPollData();
+    };
+
+    // short polling example
     let intervalId = null;
     let isFetching = false; // prevents overlapping requests
     let abortController = null; // allows in-flight request cancellation
+
     async function getData() {
       if (isFetching) return;
       isFetching = true;
@@ -54,9 +66,10 @@
       document.getElementById("content").innerHTML = JSON.stringify(data);
     }
     document.addEventListener("DOMContentLoaded", () => {
-      const id = setInterval(() => {
-        getData();
-      }, 1000);
+      // const id = setInterval(() => {
+      //   getData();
+      // }, 1000);
+      getLongPollData();
     });
   </script>
 </html>

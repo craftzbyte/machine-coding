@@ -1,57 +1,63 @@
 "use client";
-import { TabConfigs } from "./utilities/config";
-import "./styles/style.css";
-import { useState } from "react";
-import SearchBar from "./components/SearchBar";
-import UseReducerExample from "./components/UseReducerExample";
-import Link from "next/link";
-import DebouncingExample from "./components/DebouncingExample";
-import Counter from "./components/Counter";
-import USECALLBACKEX from "./components/USECALLBACKEX";
 
-function Home() {
-  const [activeTab, setActiveTab] = useState(TabConfigs[0]);
-  const ActiveTab = activeTab.component;
-  const handleActiveTab = (index: number) => {
-    setActiveTab(TabConfigs[index]);
+import React, { useEffect, useRef, useState } from "react";
+import { useDebounce } from "./hooks/useDebounce";
+const API_URL = "https://en.wikipedia.org";
+
+export default function Page() {
+  const [search, setSearch] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const skipSearchRef = useRef(true);
+
+  const value = useDebounce(search, 500);
+  const [resultData, setResult] = useState([]);
+
+  const handleSearch = async (search_query) => {
+    // https://api.duckduckgo.com/?q=your+query&format=json
+    const fetch_url = `${API_URL}/w/api.php?action=opensearch&search=${search_query}&format=json&origin=*`;
+    const res = await fetch(fetch_url);
+    const data = await res.json();
+    setResult(data[1] ?? []);
+    setShowResults(true);
   };
-
-  const handleSubmit = () => {
-    if (userInfo.name.length < 2) {
-      alert("name should be more than 2 letter");
-    }
-    if (!userInfo.email.includes("@")) {
-      alert("must include @");
-    }
+  const handleSelect = (value) => {
+    skipSearchRef.current = false;
+    setSearch(value);
+    setShowResults(false);
   };
+  useEffect(() => {
+    if (!value) return;
+    if (!skipSearchRef.current) {
+      skipSearchRef.current = true;
+      return;
+    }
+    handleSearch(value);
+  }, [value]);
 
-  const [userInfo, setUserInfo] = useState({
-    name: "User",
-    email: "email@mail.com",
-    theme: "light",
-    interest: ["gaming", "coding"],
-  });
+  const handleInputChange = (e) => {
+    setSearch(e.target.value);
+  };
   return (
-    <div style={{ background: "white" }}>
-      <div className="tab-headings">
-        {TabConfigs.map((tab, index) => {
-          return (
-            <div onClick={() => handleActiveTab(index)} className="tab-container" key={index}>
-              {tab.name}
-            </div>
-          );
-        })}
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <div style={{ display: "flex", flexDirection: "column", width: "500px", paddingTop: "40px" }}>
+        <input onChange={handleInputChange} value={search} placeholder="Enter your query" />
+        {showResults && (
+          <div id="suggestion-area" style={{ border: "1px solid red" }}>
+            {resultData.map((result, index) => {
+              return (
+                <div
+                  onClick={() => {
+                    handleSelect(result);
+                  }}
+                  key={index}
+                >
+                  {result}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
-      <div className="tab-body">
-        <ActiveTab data={userInfo} setData={setUserInfo} handleSubmit={handleSubmit} />
-      </div>
-    </div>
-  );
-}
-export default function App() {
-  return (
-    <div>
-      <USECALLBACKEX />
     </div>
   );
 }
